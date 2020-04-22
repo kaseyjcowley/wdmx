@@ -9,51 +9,20 @@ import {
   CheckBox,
   Input,
 } from '@ui-kitten/components';
+import {useMachine} from '@xstate/react';
 import {BorderlessInput} from '../components/BorderlessInput';
 import {routes} from './routes';
+import {
+  decisionMachine,
+  EventType as DecisionEvent,
+} from '../machines/decisionMachine';
 
 const Header = () => <CardHeader title="I'm deciding:" />;
 
-type DescriptionState = {
-  description: string;
-  isAddingDescription: boolean;
-};
-
-interface Action<T extends string> {
-  type: T;
-  description?: string;
-}
-
-type DescriptionActions =
-  | Action<'ADD_DESCRIPTION_CHECKED'>
-  | Action<'ADD_DESCRIPTION_UNCHECKED'>
-  | Action<'DESCRIPTION_UPDATED'>;
-
-const descriptionReducer = (
-  state: DescriptionState,
-  action: DescriptionActions,
-) => {
-  switch (action.type) {
-    case 'ADD_DESCRIPTION_CHECKED':
-      return {...state, isAddingDescription: true};
-    case 'ADD_DESCRIPTION_UNCHECKED':
-      return {...state, description: '', isAddingDescription: false};
-    case 'DESCRIPTION_UPDATED':
-      return {...state, description: action.description || ''};
-    default:
-      return state;
-  }
-};
-
 export const DecisionScreen: React.FC<NavigationStackScreenProps> = props => {
-  const [title, setTitle] = React.useState<string>();
-  const [state, dispatch] = React.useReducer(descriptionReducer, {
-    description: '',
-    isAddingDescription: false,
-  });
+  const [current, send] = useMachine(decisionMachine);
 
   const submit = () => {
-    console.log('pressed!', title);
     props.navigation.navigate(routes.choices);
   };
 
@@ -71,29 +40,30 @@ export const DecisionScreen: React.FC<NavigationStackScreenProps> = props => {
           <Layout style={{paddingVertical: 32}}>
             <BorderlessInput
               placeholder="My next vacation..."
-              value={title}
-              onChangeText={setTitle}
+              value={current.context.decision}
+              onChangeText={decision => {
+                send({type: DecisionEvent.ENTER_DECISION, decision});
+              }}
             />
             <Layout style={{marginTop: 24}}>
               <CheckBox
                 text="Add a Description?"
-                checked={state.isAddingDescription}
+                checked={current.context.hasDescription}
                 onChange={nextChecked => {
-                  dispatch({
-                    type: nextChecked
-                      ? 'ADD_DESCRIPTION_CHECKED'
-                      : 'ADD_DESCRIPTION_UNCHECKED',
+                  send({
+                    type: DecisionEvent.TOGGLE_DESCRIPTION,
+                    checked: nextChecked,
                   });
                 }}
               />
 
-              {state.isAddingDescription && (
+              {current.context.hasDescription && (
                 <Layout style={{marginTop: 16}}>
                   <Input
                     placeholder="Description"
-                    value={state.description}
+                    value={current.context.description ?? ''}
                     onChangeText={description =>
-                      dispatch({type: 'DESCRIPTION_UPDATED', description})
+                      send({type: DecisionEvent.ENTER_DESCRIPTION, description})
                     }
                     textStyle={{paddingVertical: 8}}
                     multiline
