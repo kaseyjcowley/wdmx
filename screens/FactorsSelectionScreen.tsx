@@ -58,7 +58,9 @@ export function FactorsSelectionScreen(props: Props) {
 
   const Footer = () => (
     <Layout>
-      <Button>NEXT</Button>
+      <Button onPress={() => props.navigation.navigate('scoringInstructions')}>
+        NEXT
+      </Button>
     </Layout>
   );
 

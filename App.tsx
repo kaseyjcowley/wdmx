@@ -9,7 +9,7 @@
  */
 
 import * as React from 'react';
-import {createAppContainer} from 'react-navigation';
+import {createAppContainer, createSwitchNavigator} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
 import {ApplicationProvider, IconRegistry} from '@ui-kitten/components';
 import {EvaIconsPack} from '@ui-kitten/eva-icons';
@@ -17,8 +17,9 @@ import * as eva from '@eva-design/eva';
 import {SelectChoicesScreen} from './screens/SelectChoicesScreen';
 import {FactorsSelectionScreen} from './screens/FactorsSelectionScreen';
 import {DecisionScreen} from './screens/DecisionScreen';
+import {ScoringInstructions} from './screens/ScoringInstructions';
 
-const AppNavigator = createStackNavigator({
+const StepsNavigator = createStackNavigator({
   decision: {
     screen: DecisionScreen,
     navigationOptions: {
@@ -39,6 +40,21 @@ const AppNavigator = createStackNavigator({
     },
   },
 });
+
+const AppNavigator = createSwitchNavigator(
+  {
+    steps: {
+      screen: StepsNavigator,
+    },
+
+    scoringInstructions: {
+      screen: ScoringInstructions,
+    },
+  },
+  {
+    initialRouteName: 'scoringInstructions',
+  },
+);
 
 const AppContainer = createAppContainer(AppNavigator);
 
