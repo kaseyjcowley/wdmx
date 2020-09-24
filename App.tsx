@@ -18,6 +18,7 @@ import {SelectChoicesScreen} from './screens/SelectChoicesScreen';
 import {FactorsSelectionScreen} from './screens/FactorsSelectionScreen';
 import {DecisionScreen} from './screens/DecisionScreen';
 import {ScoringInstructions} from './screens/ScoringInstructions';
+import {Scoring} from './screens/Scoring';
 
 const StepsNavigator = createStackNavigator({
   decision: {
@@ -41,20 +42,17 @@ const StepsNavigator = createStackNavigator({
   },
 });
 
-const AppNavigator = createSwitchNavigator(
-  {
-    steps: {
-      screen: StepsNavigator,
-    },
-
-    scoringInstructions: {
-      screen: ScoringInstructions,
-    },
+const AppNavigator = createSwitchNavigator({
+  steps: {
+    screen: StepsNavigator,
   },
-  {
-    initialRouteName: 'scoringInstructions',
+  scoringInstructions: {
+    screen: ScoringInstructions,
   },
-);
+  scoring: {
+    screen: Scoring,
+  },
+});
 
 const AppContainer = createAppContainer(AppNavigator);
 
